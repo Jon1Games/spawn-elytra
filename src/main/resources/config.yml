@@ -3,3 +3,7 @@ multiplyValue: 5
 boostEnabled: true
 world: world
 message: "Drücke %key% um dich zu Boosten."
+# position
+x: 0
+y: 10
+z: 0

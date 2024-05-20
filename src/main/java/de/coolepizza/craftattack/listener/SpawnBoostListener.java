@@ -5,6 +5,7 @@ import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.KeybindComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.EntityType;
@@ -32,10 +33,15 @@ public class SpawnBoostListener extends BukkitRunnable implements Listener {
     private final List<Player> flying = new ArrayList<>();
     private final List<Player> boosted = new ArrayList<>();
     private final String message;
+    private final int x;
+    private final int y;
+    private final int z;
 
     public static SpawnBoostListener create(Plugin plugin) {
         var config = plugin.getConfig();
-        if (!config.contains("multiplyValue") || !config.contains("spawnRadius") || !config.contains("boostEnabled") || !config.contains("world") ||  !config.contains("message")) {
+        if (!config.contains("multiplyValue") || !config.contains("spawnRadius") || !config.contains("boostEnabled") ||
+                !config.contains("world") ||  !config.contains("message") || !config.contains("x") ||
+                !config.contains("y") || !config.contains("z")) {
             plugin.saveResource("config.yml", true);
             plugin.reloadConfig();
         }
@@ -46,16 +52,24 @@ public class SpawnBoostListener extends BukkitRunnable implements Listener {
                 config.getBoolean("boostEnabled"),
                 Objects.requireNonNull(Bukkit.getWorld(config.getString("world"))
                         , "Invalid world " + config.getString("world")),
-                config.getString("message"));
+                config.getString("message"),
+                config.getInt("x"),
+                config.getInt("y"),
+                config.getInt("z"));
+
     }
 
-    private SpawnBoostListener(Plugin plugin, int multiplyValue, int spawnRadius, boolean boostEnabled, World world, String message) {
+    private SpawnBoostListener(Plugin plugin, int multiplyValue, int spawnRadius, boolean boostEnabled, World world,
+                               String message, int x, int y, int z) {
         this.plugin = plugin;
         this.multiplyValue = multiplyValue;
         this.spawnRadius = spawnRadius;
         this.boostEnabled = boostEnabled;
         this.world = world;
         this.message = message;
+        this.x = x;
+        this.y = y;
+        this.z = z;
 
         this.runTaskTimer(this.plugin, 0, 3);
     }
@@ -118,6 +132,7 @@ public class SpawnBoostListener extends BukkitRunnable implements Listener {
 
     private boolean isInSpawnRadius(Player player) {
         if (!player.getWorld().equals(world)) return false;
-        return world.getSpawnLocation().distance(player.getLocation()) <= spawnRadius;
+        Location location = new Location(world, x ,y ,z);
+        return location.distance(player.getLocation()) <= spawnRadius;
     }
 }
